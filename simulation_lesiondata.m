@@ -47,7 +47,7 @@ ni3 = convnsep({kernel1D,kernel1D,kernel1D},ones(size(theta_in(:,:,:,1))),'same'
 theta_in=theta_in./ni;
 % theta_in = normalise(theta_in);
 % theta_in(mask == 0) = 0.05;
-theta_in(theta_in<0.3) = 0;
+theta_in(theta_in<0.4) = 0;
 theta_in=max(theta_in,0.01);
 theta_in=min(theta_in,0.99);
 
