@@ -30,10 +30,10 @@ tol = 1e-3;
 maxiter = 20;
 
 % minimum allowed perturbation
-dxmin = 1e-6;
+dxmin = 10;
 
 % step size ( 0.33 causes instability, 0.2 quite accurate)
-alpha = 0.1;
+alpha = 0.15;
 
 % initialize gradient norm, optimization vector, iteration counter, perturbation
 gnorm = inf; x = x0; niter = 0; dx = inf;
