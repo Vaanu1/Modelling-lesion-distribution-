@@ -33,7 +33,7 @@ maxiter = 20;
 dxmin = 10;
 
 % step size ( 0.33 causes instability, 0.2 quite accurate)
-alpha = 0.15;
+alpha = 0.33;
 
 % initialize gradient norm, optimization vector, iteration counter, perturbation
 gnorm = inf; x = x0; niter = 0; dx = inf;

@@ -8,9 +8,12 @@ function [x,histout,costdata,xc_theta1] = maximizing_function(Nmat, Rmat, mask_i
 % val = fnval(sp1,1:19);
 % val = val./sum(val);
 
-sp1 = spmak(1:2:15,[1 1 1]);
-val = fnval(sp1,1:15);
-val = val./sum(val);
+% sp1 = spmak(1:2:15,[1 1 1]);
+% val = fnval(sp1,1:15);
+sp1 = spmak(1:1:7,[1 1 1]);
+val = fnval(sp1,1:7);
+val = val./(sum(val));
+
 
 % compensating for convolution error
 normalizing_image = convnsep({val,val,val,val},ones(size(Rmat)),'same');
@@ -28,6 +31,7 @@ c00 = Rmat./Nmat;
 c00(~mask) = 0;
 c0 = zeros(size(c00));
 c0(1:2:end,1:2:end,1:2:end,1:2:end) = c00(1:2:end,1:2:end,1:2:end,1:2:end);
+c0 = c00;
 c01 = convnsep({val,val,val,val},c0,'same');
 %c01 = (c01./normalizing_image).*(max(normalizing_image(:)));% smoothed average lesion map (initialization)
 c01 = normalise((c01./normalizing_image));
@@ -42,8 +46,8 @@ lc01_norm = normalise(lc01_norm);
 
 tmp = 2*lc01 - 1;
 % tmp = normalise(convnsep({val1,val1,val1,val1},c00,'same')./convnsep({val1,val1,val1,val1},ones(size(Rmat)),'same'));
-tmp(tmp<-0.99) = -0.99;
-tmp(tmp>0.99) = 0.99;
+tmp(tmp<-0.9999) = -0.9999;
+tmp(tmp>0.9999) = 0.9999;
 lambda = atanh(tmp);
 % lambda = convnsep({val,val,val,val},lambda,'same')./convnsep({val,val,val,val},ones(size(Rmat)),'same');
 

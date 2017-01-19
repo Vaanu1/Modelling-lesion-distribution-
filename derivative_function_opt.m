@@ -1,10 +1,12 @@
 function [value,grad_matrix] = derivative_function_opt(C,N,R,ni,mask)
 %     sp1 = spmak(1:3:19,[1 1 1]);
 %     Nf = fnval(sp1,1:19);
-%     sp1 = spmak(1:2:15,[1 1 1]);
-%     Nf = fnval(sp1,1:15);
-    sp1 = spmak(1:6:37,[1 1 1]);
-    Nf = fnval(sp1,1:37);
+    sp1 = spmak(1:1:7,[1 1 1]);
+    Nf = fnval(sp1,1:7);
+%     sp1 = spmak(1:1:5,[1 1 1]);
+%     Nf = fnval(sp1,1:5);
+%     sp1 = spmak(1:6:37,[1 1 1]);
+%     Nf = fnval(sp1,1:37);
     Nf = Nf./10;
     if ~isempty(size(C,5)) || size(C,5) < 1
         C = squeeze(C);

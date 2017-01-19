@@ -8,18 +8,19 @@ val = val./sum(val);
 
 load('MNI152_T1_2mm_brain_mask.mat');
 load('NR_details.mat');
-
-% compensating for convolution error
-normalizing_image = convnsep({val,val,val,val},ones(size(Rmat)),'same');
-
 % getting the brain mask, R and N matrices ready
 mask = mask_image > 0;
 mask = repmat(mask,[1,1,1,27]);
 Rmat(~mask) = 0;
 Nmat(~mask) = 0;
 
+% compensating for convolution error
+normalizing_image = convnsep({val,val,val,val},ones(size(Rmat)),'same');
+
+
+
 c00 = 0.5+zeros(size(Nmat));%Rmat./Nmat;
-c00(~mask) = 0;
+% c00(~mask) = 0;
 c0 = zeros(size(c00));
 c0(1:2:end,1:2:end,1:2:end,1:2:end) = c00(1:2:end,1:2:end,1:2:end,1:2:end);
 c01 = convnsep({val,val,val,val},c0,'same');
@@ -42,7 +43,6 @@ lambda = atanh(tmp);
 % lambda = convnsep({val,val,val,val},lambda,'same')./convnsep({val,val,val,val},ones(size(Rmat)),'same');
 
 func = @(C) derivative_function_opt(C,Nmat,Rmat,normalizing_image,mask);
-
 %[xc,histout,costdata,itc] = cgtrust(lc01_norm(:),func,[10,0.1,60,20],1e-8);
 
 %[x,histout,costdata] = steep(lambda(:),func,0,50);
@@ -53,7 +53,7 @@ xc_theta = convnsep({val,val,val,val},xcimage,'same');
 xc_theta1 = xc_theta./normalizing_image;
 
 xc_theta1(~mask) = 0;
-figure(66),imagesc(xc_theta1(:,:,45,13));
+figure(66),imagesc(xc_theta1(:,:,45,5));
 
 
 % % % options = optimset('Gradobj','on','Algorithm','trust-region-reflective','Hessian','off','Display','iter','MaxIter',5,'MaxFunEvals',1,...
