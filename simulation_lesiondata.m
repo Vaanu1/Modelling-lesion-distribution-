@@ -1,5 +1,3 @@
-% simulation code - new (using brain mask)
-
 load('MNI152_T1_2mm_brain_mask.mat');
 load('weights.mat');
 
@@ -38,7 +36,7 @@ theta_in = imdilate(theta_in,strel('square',2));
 % % mask4(45:55,:,:,:) = 1;
 % % mask4(:,55:65,:,:) = 1;
 % % theta_in(mask4>0) = 0.05;
-kernel1D = fspecial('gaussian',[1,9],5);
+kernel1D = fspecial('gaussian',[1,3],3);
 % kernel1D = kernel1D./5;
 theta_in = convnsep({kernel1D,kernel1D,kernel1D,kernel1D},theta_in,'same');
 
@@ -55,7 +53,7 @@ mu0=norminv(theta_in,0,1);
 mu0(isinf(mu0)) = 1;
 
 data_simulated = [];
-numbers= randsample(50:300,10);
+numbers= randsample(400:500,10);
 Rmat = zeros(size(mu0));
 for n=1:10 
     pim=zeros(size(mu0(:,:,:,n)));
@@ -82,15 +80,18 @@ xcimage = reshape((1+tanh(x))./2,size(Nmat)); % getting theta_cap
 
 % sp1 = spmak(1:6:37,[1 1 1]);
 % val = fnval(sp1,1:37);
-sp1 = spmak(1:2:15,[1 1 1]);
-val = fnval(sp1,1:15);
+sp1 = spmak(1:2:11,[1 1 1]);
+val = fnval(sp1,1:11);
+sp11 = spmak(1:1:7,[1 1 1]);
+val1 = fnval(sp11,1:7);
 % sp1 = spmak(1:4:23,[1 1 1]);
 % val = fnval(sp1,1:23);
 val = val./(sum(val));
+val1 = val1./(sum(val1));
 
-normalizing_image = convnsep({val,val,val,val},ones(size(Rmat)),'same');
+normalizing_image = convnsep({val,val,val,val1},ones(size(Rmat)),'same');
 
-xc_theta = convnsep({val,val,val,val},xcimage,'same');
+xc_theta = convnsep({val,val,val,val1},xcimage,'same');
 
 xc_theta1 = xc_theta./normalizing_image;
 
@@ -98,12 +99,15 @@ xc_theta1(~mask) = 0;
 
 figure(66),imagesc(xc_theta1(:,:,45,5));colorbar
 
-kernel1D = fspecial('gaussian',[1,15],7);
-kernel1D = kernel1D./5;
-ni = convnsep({kernel1D,kernel1D,kernel1D,kernel1D},ones(size(theta_in)),'same');
-mu1=convnsep({kernel1D,kernel1D,kernel1D,kernel1D},mu0,'same');
+kernel1D = fspecial('gaussian',[1,11],3);
+kernel1D = kernel1D./sum(kernel1D);
+
+kernel1Ds = fspecial('gaussian',[1,5],3);
+kernel1Ds = kernel1Ds./sum(kernel1Ds);
+ni = convnsep({kernel1D,kernel1D,kernel1D,kernel1Ds},ones(size(theta_in)),'same');
+mu1=convnsep({kernel1D,kernel1D,kernel1D,kernel1Ds},mu0,'same');
 mu1 = mu1./ni;
-var1=convnsep({kernel1D.^2,kernel1D.^2,kernel1D.^2,kernel1D.^2},ones(size(mu0)),'same');
+var1=convnsep({kernel1D.^2,kernel1D.^2,kernel1D.^2,kernel1Ds.^2},ones(size(mu0)),'same');
 var1 = var1./var1;
 z1=mu1./sqrt(var1);
 
@@ -117,3 +121,19 @@ figure(68),imagesc(theta1(:,:,45,5));colorbar
 
 s = error.^2;
 mse = sum(s(:))/(91*109*91*10)
+rmse_percent = sqrt(mse/mean(theta1(:)>0))
+
+
+ratio = Rmat./Nmat;
+xc_ratio = convnsep({val,val,val,val1},ratio,'same');
+
+xc_ratio = xc_ratio./normalizing_image;
+figure(69),imagesc(xc_ratio(:,:,45,5));colorbar
+
+error_rn = theta1 - xc_ratio;
+s_rn = error_rn.^2;
+mse_rn = sum(s_rn(:))/(91*109*91*10)
+rmse_percent_rn = sqrt(mse_rn/mean(theta1(:)>0))
+
+% save('experiment_rn_details250.mat','theta1','xc_theta1','error','error_rn','ratio','mse','mse_rn',...
+%     'rmse_percent','rmse_percent_rn');
